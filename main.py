@@ -121,7 +121,7 @@ def main(message):  # Определяем тип инцидента и уточ
         keyboard.row('рассрочка от магазина')
         keyboard.row('Главное меню')
         keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Выберите действие', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'Выберите интересующую Вас рассрочку, которой вы хотели бы воспользоваться', reply_markup=keyboard)
         bot.register_next_step_handler(message, info)
 
     elif message.text == 'лизинг':
@@ -207,7 +207,7 @@ def vvod(message):  # Запрашиваем дополнительную инф
     global task
     if message.text in status:
         task = message.text
-        bot.send_message(message.chat.id, 'Введите желаемый срок рассрочи и первоначальный взнос, если он присутствует в строку ввода 😊')
+        bot.send_message(message.chat.id, 'Введите сумму первоначального взноса ЦИФРАМИ, если он будет, если нет то поставьте 0 в строку ввода 😊')
         bot.register_next_step_handler(message, text)
     else:
         bot.send_message(message.chat.id, 'Данные введены неверно')
