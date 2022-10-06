@@ -12,10 +12,10 @@ from re import *
 bot = telebot.TeleBot("5597293633:AAG4TN0PSvWbI93fvZdMN3enC3WsXre4__s")
  
 # Указываем какой текст мы будем ждать от бота, все остальное будет вызывать сообщение 'Данные введены неверно'
-status = ["Проблема номер 1", "Проблема номер 2", "Проблема номер 3",
-          "Проблема номер 4", "Проблема номер 5", "Проблема номер 6", "Проблема номер 7", "Проблема номер 8",
-          "Проблема номер 9", "Большая дилемма", "Небольшая дилемма", "Другая дилемма",
-          "У меня другой запрос"]
+status = ["кредит", "рассрочка", "лизинг",
+          'кредит на автоприцеп', 'кредит на трактор', 'кредит на мотоблок', 'карты рассрочки', 'рассрочка от магазина',
+          'расчитать на 12 месяцев', 'расчитать на 18 месяцев', 'расчитать на 24 месяца', 'расчитать на 36 месяцев','расчитать на 48 месяцев',
+          'расчитать на другой срок кредитования']
  
 inc_type = []  # Хранит в себе тип заявки
 cli_num = []  # Хранит в себе номер телефона заявителя
@@ -33,7 +33,7 @@ def statup(message):  # Здороваемся и просим ввести но
     key1.one_time_keyboard = True
     if len(hello_count) == 0:  # Проверяем здоровались ли мы ранее
         bot.send_message(message.chat.id,
-                         "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, бот созданный для добрых дел."
+                         "Добро пожаловать, {0.first_name}!\nЯ - <b>{1.first_name}</b>, бот созданный для подбора кредитных продуктов."
                          " Отправте свой номер телефона или почту, чтоб начать работу ".format(
                              message.from_user, bot.get_me()),
                          parse_mode='html', reply_markup=key1)
@@ -60,7 +60,7 @@ def phone_check(message):  # Уточняем у пользователя чем
             statup(message)
     elif message.text == "Ввести почту для обратной связи":  # Перекидывает на ввод почты
         mail_check(message)
-    elif message.text == 'Ⓜ Главное меню':
+    elif message.text == 'Главное меню':
         pre_main(message)
     else:
         statup(message)
@@ -69,20 +69,20 @@ def phone_check(message):  # Уточняем у пользователя чем
 def mail_check(message):  # Функция ввода почты
     key1 = telebot.types.ReplyKeyboardMarkup(True, False)
     key1.row("Проверить")
-    bot.send_message(message.chat.id, 'Введите вашу почту ⤵')
+    bot.send_message(message.chat.id, 'Введите вашу почту')
     if message.text == 'Ввести почту для обратной связи':
         bot.register_next_step_handler(message, mail_check2)
-    elif message.text == 'Ⓜ Главное меню':
+    elif message.text == 'Главное меню':
         pre_main(message)
  
  
 def mail_check2(message):  # Проверка потчы на валидность
-    pattern = compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')  # Проверяем совпадает ли паттерк
+    pattern = compile('(^|\s)[-a-z0-9_.]+@([-a-z0-9]+\.)+[a-z]{2,6}(\s|$)')  # Проверяем совпадает ли паттерн
     is_valid = pattern.match(message.text)
     if is_valid:
         cli_mail.append(message.text)  # Записываем полученную почту
         pre_main(message)
-    elif message.text == 'Ⓜ Главное меню':
+    elif message.text == 'Главное меню':
         pre_main(message)
     else:
         bot.send_message(message.chat.id, "Почта введена неверно.")
@@ -92,107 +92,108 @@ def mail_check2(message):  # Проверка потчы на валидност
 def pre_main(message):  # Основная функция
     inc_type.clear()  # Очищаем словарь с типом заявки
     key = types.ReplyKeyboardMarkup(True, False)
-    key.row('У меня проблема')
-    key.row('У меня дилемма', "У меня другой запрос")
+    key.row('кредит')
+    key.row('рассрочка')
+    key.row('лизинг')
     key.one_time_keyboard = True
-    try:  # Спрашиваем что за инцент
-        bot.send_message(message.chat.id,
-                         "Итак, {0.first_name}!, что у вас случилось?.".format(
+    # Спрашиваем что за инцент
+    bot.send_message(message.chat.id,
+                         "Итак, {0.first_name}!, выберите продукт который Вас заинтересовал.".format(
                              message.from_user, bot.get_me()),
                          parse_mode='html', reply_markup=key)
-        print('No problem detected. Message send')
-    except OSError:  # Спрашиваем что за инцент если предидущий вызвал ошибку таймаута
-        print("ConnectionError - Sending again after 5 seconds!!!")
-        time.sleep(5)
-        bot.send_message(message.chat.id,
-                         "Итак, {0.first_name}, что у вас случилось?.".format(
-                             message.from_user, bot.get_me()),
-                         parse_mode='html', reply_markup=key)
-        print('Problem solved')
+    print('No problem detected. Message send')
     bot.register_next_step_handler(message, main)
  
  
 def main(message):  # Определяем тип инцидента и уточняем его подтип
-    if message.text == 'У меня проблема':
+    if message.text == 'кредит':
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Большая проблема')
-        keyboard.row('Небольшая проблема')
-        keyboard.row('Другая проблема')
-        keyboard.row('Ⓜ Главное меню')
-        bot.send_message(message.chat.id, 'Выберите действие ⤵', reply_markup=keyboard)
+        keyboard.row('кредит на мотоблок')
+        keyboard.row('кредит на трактор')
+        keyboard.row('кредит на автоприцеп')
+        keyboard.row('Главное меню')
+        bot.send_message(message.chat.id, 'Выберите действие', reply_markup=keyboard)
         bot.register_next_step_handler(message, incedent)
-    elif message.text == 'У меня дилемма':
+    elif message.text == 'рассрочка':
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Большая дилемма', 'Небольшая дилемма')
-        keyboard.row('Другая дилемма')
-        keyboard.row('Ⓜ Главное меню')
+        keyboard.row('карты рассрочки') 
+        keyboard.row('банковская рассрочка')
+        keyboard.row('рассрочка от магазина')
+        keyboard.row('Главное меню')
         keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Выберите действие ⤵', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'Выберите действие', reply_markup=keyboard)
         bot.register_next_step_handler(message, info)
-    elif message.text == 'У меня другой запрос':
+
+    elif message.text == 'лизинг':
         task = message.text
         vvod(message)
-    elif message.text == 'Ⓜ Главное меню':
+        bot.send_message(message.chat.id,
+        "Итак, {0.first_name}!, поскольку лизинговые уловия подбираются индивидуально для каждого клиента, в ближайшее время с Вами свяжется наш менеджер.".format(
+        message.from_user, bot.get_me()),
+        parse_mode='html')
+      
+    elif message.text == ' Главное меню':
         pre_main(message)
  
     else:
-        bot.send_message(message.chat.id, '🚫 Данные введены неверно 🚫')
+        bot.send_message(message.chat.id, 'Данные введены неверно')
         pre_main(message)
  
  
 def incedent(message):  # Обрабатываем подтип инцедента
     keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-    keyboard.add('Ⓜ Главное меню')
+    keyboard.add('Главное меню')
  
-    if message.text == 'Большая проблема':
+    if message.text == 'кредит на мотоблок':
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 1')
-        keyboard.row('Проблема номер 2')
-        keyboard.row('Проблема номер 3')
-        keyboard.add('Ⓜ Главное меню')
+        keyboard.row('расчитать на 12 месяцев')
+        keyboard.row('расчитать на 18 месяцев')
+        keyboard.row('расчитать на 24 месяца')
+        keyboard.row('расчитать на другой срок кредитования')
+        keyboard.add('Главное меню')
         keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'Выберите пожалуйста на какой срок вы бы хотели получить расчет кредита', reply_markup=keyboard)
         bot.register_next_step_handler(message, vvod)
  
-    elif message.text == 'Небольшая проблема':
+    elif message.text == 'кредит на трактор':
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 4')
-        keyboard.row('Проблема номер 5')
-        keyboard.row('Проблема номер 6')
-        keyboard.add('Ⓜ Главное меню')
+        keyboard.row('расчитать на 24 месяца')
+        keyboard.row('расчитать на 36 месяцев')
+        keyboard.row('расчитать на 48 месяцев')
+        keyboard.add('Главное меню')
         keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'Выберите пожалуйста на какой срок вы бы хотели получить расчет кредита', reply_markup=keyboard)
         bot.register_next_step_handler(message, vvod)
  
-    elif message.text == 'Другая проблема':
+    elif message.text == 'кредит на автоприцеп':
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Проблема номер 7')
-        keyboard.row('Проблема номер 8')
-        keyboard.row('Проблема номер 9')
-        keyboard.add('Ⓜ Главное меню')
+        keyboard.row('расчитать на 12 месяцев')
+        keyboard.row('расчитать на 18 месяцев')
+        keyboard.row('расчитать на 24 месяца')
+        keyboard.add('Главное меню')
         keyboard.one_time_keyboard = True
-        bot.send_message(message.chat.id, 'Укажите вашу проблему ⤵', reply_markup=keyboard)
+        bot.send_message(message.chat.id, 'Выберите пожалуйста на какой срок вы бы хотели получить расчет кредита', reply_markup=keyboard)
         bot.register_next_step_handler(message, vvod)
  
-    elif message.text == 'Ⓜ Главное меню':
+    elif message.text == 'Главное меню':
         pre_main(message)
  
     else:
-        bot.send_message(message.chat.id, 'Данные введены неверно 😢')
+        bot.send_message(message.chat.id, 'Данные введены неверно')
         pre_main(message)
  
  
 def info(message):  # Обработываем подтип запроса информации
-    if message.text == 'Ⓜ Главное меню':
+    if message.text == 'Главное меню':
         pre_main(message)
-    elif message.text == 'Большая дилемма':
+    elif message.text == 'карты рассрочки':
         global task
         task = message.text
         vvod(message)
-    elif message.text == 'Небольшая дилемма':
+    elif message.text == 'банковская рассрочка':
         task = message.text
         vvod(message)
-    elif message.text == 'Другая дилемма':
+    elif message.text == 'рассрочка от магазина':
         task = message.text
         vvod(message)
     else:
@@ -206,7 +207,7 @@ def vvod(message):  # Запрашиваем дополнительную инф
     global task
     if message.text in status:
         task = message.text
-        bot.send_message(message.chat.id, 'Введите детали вашего запроса в строку ввода 😊')
+        bot.send_message(message.chat.id, 'Введите желаемый срок рассрочи и первоначальный взнос, если он присутствует в строку ввода 😊')
         bot.register_next_step_handler(message, text)
     else:
         bot.send_message(message.chat.id, 'Данные введены неверно')
@@ -214,13 +215,13 @@ def vvod(message):  # Запрашиваем дополнительную инф
  
  
 def text(message):  # Отправляем письмо
-    if message.text == 'Ⓜ Главное меню':
+    if message.text == 'Главное меню':
         pre_main(message)
     else:
         keyboard = telebot.types.ReplyKeyboardMarkup(True, False)
-        keyboard.row('Ⓜ Главное меню')
+        keyboard.row('Главное меню')
         bot.send_message(message.chat.id, 'Ваше запрос \"' + message.text +
-                         '\" получен. Можете вернуться в главное меню ⤵', reply_markup=keyboard)
+                         '\" получен. Можете вернуться в главное меню ', reply_markup=keyboard)
         addr_from = "mail@gmail.com"
         addr_to = "mail@gmail.com"
         password = "password"
